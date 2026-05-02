@@ -1,0 +1,1824 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#d42424" />
+  <title>我的贷款</title>
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --red-deep: #c41e1e;
+      --red-mid: #e83434;
+      --red-light: #ff6b5c;
+      --bg-page: #f2f3f5;
+      --text-primary: #1a1a1a;
+      --text-secondary: #8c8c8c;
+      --white: #fff;
+      --blue-soft: #e8f2ff;
+      --pink-soft: #ffe8ec;
+      --nav-active: #e02020;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-top: env(safe-area-inset-top, 0px);
+      --detail-bg: #f8f8f8;
+      --detail-muted: #999;
+      --detail-line: #ebebeb;
+      --detail-red: #e63935;
+      --detail-pad-x: 16px;
+    }
+
+    html {
+      font-size: 16px;
+      -webkit-tap-highlight-color: transparent;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", "Microsoft YaHei", sans-serif;
+      background: var(--bg-page);
+      color: var(--text-primary);
+      height: 100%;
+      max-height: 100dvh;
+      overflow: hidden;
+      margin: 0;
+    }
+
+    .app {
+      max-width: 430px;
+      margin: 0 auto;
+      height: 100dvh;
+      max-height: 100dvh;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      padding-bottom: calc(56px + var(--safe-bottom));
+      box-sizing: border-box;
+    }
+
+    /* 首页头部（红色区域加高） */
+    #view-home .header {
+      flex-shrink: 0;
+      background: linear-gradient(180deg, var(--red-deep) 0%, var(--red-mid) 38%, var(--red-light) 100%);
+      padding: calc(10px + var(--safe-top)) 14px 118px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #view-home .header::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 120% 80% at 100% 0%, rgba(255, 255, 255, 0.12) 0%, transparent 50%),
+        radial-gradient(ellipse 80% 60% at 0% 100%, rgba(255, 255, 255, 0.08) 0%, transparent 45%);
+      pointer-events: none;
+    }
+
+    #view-home .header-waves {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 48px;
+      opacity: 0.15;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 120'%3E%3Cpath fill='%23fff' d='M0 80c240-40 480-40 720 0s480 40 720 0v40H0z'/%3E%3C/svg%3E") repeat-x bottom / 720px 48px;
+      pointer-events: none;
+    }
+
+    #view-home .header-title {
+      text-align: center;
+      position: relative;
+      z-index: 1;
+      padding: 8px 0 22px;
+    }
+
+    #view-home .header-title h1 {
+      font-size: 19px;
+      font-weight: 700;
+      color: var(--white);
+      letter-spacing: 0.02em;
+    }
+
+    #view-home .header-title p {
+      margin-top: 12px;
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.92);
+      font-weight: 400;
+    }
+
+    /* 快捷卡片 — 压在红头上 */
+    .quick-card-wrap {
+      flex-shrink: 0;
+      margin-top: -62px;
+      padding: 0 14px;
+      position: relative;
+      z-index: 3;
+    }
+
+    .quick-card {
+      background: var(--white);
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      display: flex;
+      overflow: hidden;
+    }
+
+    .quick-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 16px 12px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+      border-right: 1px solid #f0f0f0;
+    }
+
+    .quick-item:last-child {
+      border-right: none;
+    }
+
+    .quick-item svg {
+      width: 40px;
+      height: 40px;
+    }
+
+    /* 首页主内容 */
+    #view-home .main {
+      flex: 1 1 0;
+      min-height: 0;
+      overflow-x: hidden;
+      overflow-y: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      padding: 10px 14px 12px;
+    }
+
+    #view-home .main::-webkit-scrollbar {
+      display: none;
+      width: 0;
+      height: 0;
+    }
+
+    .section-card {
+      background: var(--white);
+      border-radius: 12px;
+      padding: 14px 12px 14px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+    }
+
+    .section-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+    }
+
+    .highlight-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .highlight-box {
+      border-radius: 10px;
+      padding: 10px 10px 12px;
+      position: relative;
+      overflow: hidden;
+      min-height: 68px;
+    }
+
+    .highlight-box.blue {
+      background: var(--blue-soft);
+    }
+
+    .highlight-box.pink {
+      background: var(--pink-soft);
+    }
+
+    .highlight-box h3 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+
+    .highlight-box p {
+      font-size: 11px;
+      color: var(--text-secondary);
+      line-height: 1.45;
+      max-width: 70%;
+    }
+
+    .highlight-deco {
+      position: absolute;
+      right: 6px;
+      bottom: 4px;
+      opacity: 0.35;
+    }
+
+    .highlight-deco svg {
+      width: 44px;
+      height: 44px;
+    }
+
+    /* 功能网格 */
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px 6px;
+    }
+
+    .grid-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      text-align: center;
+    }
+
+    .grid-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: #fafafa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #f0f0f0;
+    }
+
+    .grid-icon svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .grid-item span {
+      font-size: 10px;
+      color: var(--text-primary);
+      line-height: 1.25;
+      padding: 0 2px;
+    }
+
+    /* 底部导航 */
+    .bottom-nav {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 0;
+      width: 100%;
+      max-width: 430px;
+      background: var(--white);
+      border-top: 1px solid #eee;
+      display: flex;
+      justify-content: space-around;
+      align-items: flex-end;
+      padding: 6px 8px calc(8px + var(--safe-bottom));
+      z-index: 100;
+      box-shadow: 0 -2px 16px rgba(0, 0, 0, 0.06);
+    }
+
+    .nav-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 0;
+      color: var(--text-secondary);
+      font-size: 10px;
+      text-decoration: none;
+      border: none;
+      background: none;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .nav-item .nav-ico {
+      width: 26px;
+      height: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .nav-item .nav-ico svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .nav-item.active {
+      color: var(--nav-active);
+    }
+
+    .nav-item.active .nav-ico-wrap {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(145deg, var(--red-mid), var(--red-deep));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: -2px;
+      box-shadow: 0 2px 8px rgba(196, 30, 30, 0.35);
+    }
+
+    .nav-item.active .nav-ico-wrap svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .nav-item.active .nav-ico-wrap svg path,
+    .nav-item.active .nav-ico-wrap svg circle {
+      stroke: #fff;
+      fill: none;
+    }
+
+    .nav-item.active .nav-ico-wrap svg circle[fill] {
+      fill: #fff;
+    }
+
+    /* —— 贷款详情 / 提前还款（共用布局）—— */
+    #view-xq,
+    #view-tqhk {
+      background: var(--detail-bg);
+      color: var(--text-primary);
+    }
+
+    #view-xq .detail-page,
+    #view-tqhk .detail-page {
+      max-width: 430px;
+      margin: 0 auto;
+      width: 100%;
+      height: 100dvh;
+      max-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--detail-bg);
+    }
+
+    #view-xq .detail-top,
+    #view-tqhk .detail-top {
+      flex-shrink: 0;
+      background: linear-gradient(180deg, #ffe8ea 0%, #fff2f0 42%, #faf8f8 78%, var(--detail-bg) 100%);
+      padding: calc(10px + var(--safe-top)) 8px 14px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+    }
+
+    #view-xq .detail-top-inner,
+    #view-tqhk .detail-top-inner {
+      display: grid;
+      grid-template-columns: 44px 1fr 44px;
+      align-items: center;
+    }
+
+    #view-xq .detail-back,
+    #view-tqhk .detail-back {
+      justify-self: start;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      margin-left: 2px;
+      color: var(--text-primary);
+      border: none;
+      background: none;
+      padding: 0;
+      cursor: pointer;
+      border-radius: 8px;
+      font-family: inherit;
+      text-decoration: none;
+    }
+
+    #view-xq .detail-back svg,
+    #view-tqhk .detail-back svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    #view-xq .detail-title,
+    #view-tqhk .detail-title {
+      text-align: center;
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    #view-xq .detail-main {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      padding: 12px var(--detail-pad-x) calc(20px + var(--safe-bottom));
+    }
+
+    #view-xq .detail-main::-webkit-scrollbar {
+      width: 0;
+      height: 0;
+    }
+
+    #view-tqhk .detail-main {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      padding: 16px var(--detail-pad-x) calc(24px + var(--safe-bottom));
+    }
+
+    #view-xq .xq-summary {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
+      display: flex;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+
+    #view-xq .xq-summary-col {
+      flex: 1;
+      padding: 18px 12px 20px;
+      text-align: center;
+    }
+
+    #view-xq .xq-summary-col:first-child {
+      border-right: 1px solid var(--detail-line);
+    }
+
+    #view-xq .xq-summary-label {
+      font-size: 12px;
+      color: var(--detail-muted);
+      margin-bottom: 10px;
+      line-height: 1.3;
+    }
+
+    #view-xq .xq-summary-num {
+      font-size: 22px;
+      font-weight: 700;
+      color: #1a1a1a;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.02em;
+      line-height: 1.2;
+    }
+
+    #view-xq .xq-block {
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 10px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+    }
+
+    #view-xq .xq-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 48px;
+      padding: 13px var(--detail-pad-x);
+      font-size: 15px;
+      position: relative;
+    }
+
+    #view-xq .xq-row:not(:last-child)::after {
+      content: "";
+      position: absolute;
+      left: var(--detail-pad-x);
+      right: 0;
+      bottom: 0;
+      height: 1px;
+      background: var(--detail-line);
+    }
+
+    #view-xq .xq-row-label {
+      flex-shrink: 0;
+      color: var(--text-primary);
+      font-weight: 400;
+    }
+
+    #view-xq .xq-row-value {
+      text-align: right;
+      color: var(--detail-muted);
+      font-size: 14px;
+      line-height: 1.4;
+      word-break: break-all;
+    }
+
+    #view-xq .xq-row-value-row {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+      gap: 6px 8px;
+      text-align: right;
+    }
+
+    #view-xq .xq-link-copy {
+      border: none;
+      background: none;
+      padding: 0;
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--detail-red);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    #view-xq button.xq-row-link {
+      border: none;
+      background: none;
+      font: inherit;
+      cursor: pointer;
+      width: 100%;
+      color: inherit;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 48px;
+      padding: 13px var(--detail-pad-x);
+      font-size: 15px;
+      position: relative;
+      text-align: left;
+    }
+
+    #view-xq .xq-row-link .xq-chev {
+      color: #ccc;
+      flex-shrink: 0;
+      margin-left: 8px;
+    }
+
+    #view-xq .xq-row-link .xq-chev svg {
+      width: 18px;
+      height: 18px;
+      display: block;
+    }
+
+    #view-xq .xq-main-cta {
+      margin-top: 12px;
+    }
+
+    #view-xq .xq-btn-primary {
+      display: block;
+      width: 100%;
+      padding: 15px 20px;
+      border: none;
+      border-radius: 999px;
+      font-size: 18px;
+      font-weight: 600;
+      font-family: inherit;
+      color: #fff;
+      background: var(--detail-red);
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(230, 57, 53, 0.4);
+    }
+
+    #view-xq .xq-btn-primary:active {
+      opacity: 0.92;
+    }
+
+    /* 还款计划抽屉 */
+    #view-xq .drawer-root {
+      position: fixed;
+      inset: 0;
+      z-index: 300;
+      display: flex;
+      justify-content: center;
+      pointer-events: none;
+      visibility: hidden;
+    }
+
+    #view-xq .drawer-root.is-open {
+      pointer-events: auto;
+      visibility: visible;
+    }
+
+    #view-xq .drawer-mask {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    #view-xq .drawer-root.is-open .drawer-mask {
+      opacity: 1;
+    }
+
+    #view-xq .drawer-sheet {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      max-width: 430px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 16px 16px 0 0;
+      box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.12);
+      max-height: calc(90dvh - env(safe-area-inset-bottom, 0px) - 12px);
+      height: calc(90dvh - env(safe-area-inset-bottom, 0px) - 12px);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transform: translateY(100%);
+      transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+    }
+
+    #view-xq .drawer-root.is-open .drawer-sheet {
+      transform: translateY(0);
+    }
+
+    #view-xq .drawer-head {
+      flex-shrink: 0;
+      display: grid;
+      grid-template-columns: 44px 1fr 44px;
+      align-items: center;
+      padding: 12px 8px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    #view-xq .drawer-close {
+      justify-self: start;
+      width: 40px;
+      height: 40px;
+      margin-left: 4px;
+      border: none;
+      background: none;
+      padding: 0;
+      cursor: pointer;
+      color: #333;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      font-family: inherit;
+    }
+
+    #view-xq .drawer-head-title {
+      text-align: center;
+      font-size: 17px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    #view-xq .drawer-body {
+      flex: 1 1 0;
+      min-height: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 14px var(--detail-pad-x) 8px;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+      touch-action: pan-y;
+    }
+
+    #view-xq .plan-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    #view-xq .plan-tab {
+      flex: 1;
+      padding: 10px 6px;
+      border: none;
+      border-radius: 6px;
+      font-size: 12px;
+      font-family: inherit;
+      font-weight: 500;
+      color: #333;
+      background: #f5f5f5;
+      cursor: pointer;
+      line-height: 1.25;
+      text-align: center;
+    }
+
+    #view-xq .plan-tab.is-active {
+      background: #ffe8ea;
+      color: var(--detail-red);
+    }
+
+    #view-xq .plan-hint {
+      font-size: 11px;
+      color: var(--detail-muted);
+      line-height: 1.45;
+      margin-bottom: 14px;
+    }
+
+    #view-xq .plan-summary {
+      font-size: 14px;
+      font-weight: 700;
+      color: #333;
+      line-height: 1.5;
+      margin-bottom: 18px;
+    }
+
+    #view-xq .plan-summary .interest {
+      color: #f59a23;
+      font-weight: 700;
+    }
+
+    #view-xq .plan-timeline {
+      list-style: none;
+    }
+
+    #view-xq .plan-item {
+      display: grid;
+      grid-template-columns: 44px 14px 1fr;
+      column-gap: 8px;
+    }
+
+    #view-xq .plan-date {
+      font-size: 14px;
+      color: #666;
+      padding-top: 2px;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    #view-xq .plan-track {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100%;
+    }
+
+    #view-xq .plan-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ccc;
+      flex-shrink: 0;
+      margin-top: 6px;
+      z-index: 1;
+    }
+
+    #view-xq .plan-line {
+      flex: 1;
+      width: 0;
+      border-left: 1px dashed #ddd;
+      min-height: 28px;
+      margin: 4px 0 0;
+    }
+
+    #view-xq .plan-item:last-child .plan-line {
+      display: none;
+    }
+
+    #view-xq .plan-detail {
+      padding-bottom: 18px;
+    }
+
+    #view-xq .plan-item:last-child .plan-detail {
+      padding-bottom: 4px;
+    }
+
+    #view-xq .plan-amt {
+      font-size: 16px;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 4px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    #view-xq .plan-sub {
+      font-size: 12px;
+      color: #888;
+      line-height: 1.4;
+    }
+
+    #view-xq .drawer-foot {
+      flex-shrink: 0;
+      padding: 12px var(--detail-pad-x) calc(14px + var(--safe-bottom));
+      border-top: 1px solid #f5f5f5;
+      background: #fff;
+    }
+
+    #view-xq .drawer-foot .btn-confirm {
+      display: block;
+      width: 100%;
+      padding: 14px 20px;
+      border: none;
+      border-radius: 999px;
+      font-size: 17px;
+      font-weight: 600;
+      font-family: inherit;
+      color: #fff;
+      background: var(--detail-red);
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(230, 57, 53, 0.3);
+    }
+
+    body.drawer-open #app-root {
+      pointer-events: none;
+    }
+
+    /* 提前还款表单 */
+    #view-tqhk .tq-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 18px 16px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+      margin-bottom: 16px;
+    }
+
+    #view-tqhk .tq-card-label {
+      font-size: 13px;
+      color: var(--detail-muted);
+      margin-bottom: 8px;
+    }
+
+    #view-tqhk .tq-card-balance {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--text-primary);
+      font-variant-numeric: tabular-nums;
+    }
+
+    #view-tqhk .tq-field-label {
+      font-size: 14px;
+      color: var(--text-primary);
+      margin-bottom: 10px;
+      font-weight: 500;
+    }
+
+    #view-tqhk .tq-field-wrap {
+      background: #fff;
+      border-radius: 10px;
+      padding: 14px 16px;
+      box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    #view-tqhk .tq-field-wrap .prefix {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    #view-tqhk .tq-field-wrap input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-size: 22px;
+      font-weight: 600;
+      font-family: inherit;
+      color: var(--text-primary);
+      min-width: 0;
+      font-variant-numeric: tabular-nums;
+    }
+
+    #view-tqhk .tq-field-wrap input::placeholder {
+      color: #ccc;
+      font-weight: 400;
+      font-size: 18px;
+    }
+
+    #view-tqhk .tq-hint {
+      font-size: 12px;
+      color: var(--detail-muted);
+      line-height: 1.45;
+      margin-bottom: 24px;
+    }
+
+    #view-tqhk .tq-btn-submit {
+      width: 100%;
+      padding: 15px 20px;
+      border: none;
+      border-radius: 999px;
+      font-size: 17px;
+      font-weight: 600;
+      font-family: inherit;
+      color: #fff;
+      background: var(--detail-red);
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(230, 57, 53, 0.35);
+    }
+
+    #view-tqhk .tq-btn-submit:active {
+      opacity: 0.92;
+    }
+
+    /* —— 子页面视图（原 dk / ed）—— */
+    .view {
+      display: none;
+      flex: 1 1 0;
+      flex-direction: column;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .view.is-active {
+      display: flex;
+    }
+
+    .app.hide-bottom-nav {
+      padding-bottom: 0;
+    }
+
+    .bottom-nav.is-hidden {
+      display: none;
+    }
+
+    button.quick-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      background: none;
+      font: inherit;
+      cursor: pointer;
+      color: inherit;
+      flex: 1;
+    }
+
+    .sub-root {
+      flex: 1 1 0;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      max-width: 430px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .sub-root-dk {
+      background: #f5f5f5;
+      color: #1a1a1a;
+    }
+
+    .sub-root-ed {
+      background: #f7f7f7;
+      color: #333;
+    }
+
+    .sub-top-bar {
+      flex-shrink: 0;
+      display: grid;
+      grid-template-columns: 44px 1fr 44px;
+      align-items: center;
+      background: #fff;
+      padding: calc(10px + var(--safe-top)) 8px 12px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .sub-back {
+      justify-self: start;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      margin-left: 4px;
+      color: inherit;
+      border: none;
+      background: none;
+      padding: 0;
+      cursor: pointer;
+      border-radius: 8px;
+      font-family: inherit;
+    }
+
+    .sub-back svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    .sub-top-title {
+      text-align: center;
+      font-size: 17px;
+      font-weight: 600;
+      color: inherit;
+    }
+
+    .sub-hint-strip {
+      flex-shrink: 0;
+      background: #ebebeb;
+      padding: 10px 16px;
+      font-size: 12px;
+      color: #999;
+      line-height: 1.45;
+    }
+
+    .sub-main-dk {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      padding: 12px 14px calc(16px + var(--safe-bottom));
+    }
+
+    button.loan-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border: none;
+      background: #fff;
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    .sub-main-dk button.loan-card {
+      text-decoration: none;
+    }
+
+    .loan-card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 16px 14px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      color: inherit;
+    }
+
+    .loan-card-main {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .loan-card h2 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 6px;
+    }
+
+    .loan-id {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 10px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .loan-meta {
+      font-size: 13px;
+      color: #666;
+      line-height: 1.55;
+    }
+
+    .loan-meta p + p {
+      margin-top: 4px;
+    }
+
+    .loan-action {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      font-size: 14px;
+      color: #666;
+      padding: 8px 0 8px 8px;
+    }
+
+    .loan-action svg {
+      width: 16px;
+      height: 16px;
+      opacity: 0.55;
+    }
+
+    .sub-main-ed {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      padding: 16px 14px calc(20px + var(--safe-bottom));
+    }
+
+    .ed-card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+      padding: 18px 16px 10px;
+    }
+
+    .ed-card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .ed-card-head h2 {
+      font-size: 17px;
+      font-weight: 700;
+      color: #333;
+    }
+
+    .ed-card-head a {
+      font-size: 13px;
+      color: #999;
+      text-decoration: none;
+    }
+
+    .ed-hint {
+      font-size: 12px;
+      color: #999;
+      line-height: 1.5;
+      margin-bottom: 10px;
+    }
+
+    .ed-amount-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .ed-amount {
+      font-size: 28px;
+      font-weight: 700;
+      color: #333;
+      letter-spacing: 0.02em;
+      line-height: 1.2;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .ed-btn-use {
+      flex-shrink: 0;
+      padding: 10px 18px;
+      border: none;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+      cursor: pointer;
+      font-family: inherit;
+      background: linear-gradient(135deg, #e62e2e, #ff4d4f);
+      box-shadow: 0 2px 8px rgba(230, 46, 46, 0.35);
+    }
+
+    .ed-term {
+      font-size: 12px;
+      color: #999;
+      margin-bottom: 16px;
+    }
+
+    .ed-divider {
+      height: 1px;
+      background: #eee;
+      margin: 0 -4px 10px;
+    }
+
+    .ed-expand {
+      display: flex;
+      justify-content: center;
+      padding-bottom: 4px;
+      color: #ccc;
+    }
+
+    .ed-expand svg {
+      width: 18px;
+      height: 18px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app" id="app-root">
+    <div id="view-home" class="view view-home is-active">
+    <header class="header">
+      <div class="header-waves" aria-hidden="true"></div>
+      <div class="header-title">
+        <h1>我的贷款</h1>
+        <p>您没有应还贷款</p>
+      </div>
+    </header>
+
+    <div class="quick-card-wrap">
+      <div class="quick-card" role="navigation" aria-label="快捷入口">
+        <button type="button" class="quick-item" data-open-view="dk" aria-label="贷款记录">
+          <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+            <rect x="10" y="8" width="28" height="32" rx="3" stroke="#333" stroke-width="1.8" />
+            <path d="M16 16h16M16 22h10" stroke="#333" stroke-width="1.5" stroke-linecap="round" />
+            <path d="M28 28l6 8M28 36l6-8" stroke="#e02020" stroke-width="1.8" stroke-linecap="round" />
+            <rect x="14" y="28" width="8" height="5" rx="1" fill="#e02020" opacity="0.85" />
+          </svg>
+          贷款记录
+        </button>
+        <button type="button" class="quick-item" data-open-view="ed" aria-label="额度记录">
+          <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+            <rect x="10" y="8" width="28" height="32" rx="3" stroke="#333" stroke-width="1.8" />
+            <path d="M16 16h16M16 22h12" stroke="#333" stroke-width="1.5" stroke-linecap="round" />
+            <path d="M18 30h12v6H18z" stroke="#e02020" stroke-width="1.5" />
+            <path d="M21 33h6M24 30v6" stroke="#e02020" stroke-width="1.2" />
+          </svg>
+          额度记录
+        </button>
+      </div>
+    </div>
+
+    <main class="main">
+      <section class="section-card" aria-labelledby="post-loan-title">
+        <h2 id="post-loan-title" class="section-title">贷后服务</h2>
+        <div class="highlight-row">
+          <div class="highlight-box blue">
+            <h3>月度账单</h3>
+            <p>随时查询<br />电子推送</p>
+            <div class="highlight-deco" aria-hidden="true">
+              <svg viewBox="0 0 48 48" fill="none">
+                <rect x="8" y="6" width="28" height="36" rx="2" stroke="#4a90d9" stroke-width="1.5" />
+                <path d="M14 14h16M14 20h12M14 26h16" stroke="#4a90d9" stroke-width="1.2" opacity="0.6" />
+              </svg>
+            </div>
+          </div>
+          <div class="highlight-box pink">
+            <h3>开立证明</h3>
+            <p>手机一点</p>
+            <div class="highlight-deco" aria-hidden="true">
+              <svg viewBox="0 0 48 48" fill="none">
+                <rect x="8" y="8" width="26" height="32" rx="2" stroke="#d4245c" stroke-width="1.5" />
+                <path d="M24 6l3 5h-6l3-5z" fill="#d4245c" opacity="0.6" />
+                <path d="M14 18h14M14 24h10" stroke="#d4245c" stroke-width="1.2" opacity="0.5" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-4">
+          <a class="grid-item" href="#">
+            <div class="grid-icon">
+              <svg viewBox="0 0 32 32" fill="none">
+                <circle cx="16" cy="16" r="12" stroke="#c41e1e" stroke-width="1.6" />
+                <path d="M16 10v6l4 2" stroke="#c41e1e" stroke-width="1.5" stroke-linecap="round" />
+                <text x="16" y="22" text-anchor="middle" font-size="9" fill="#c41e1e" font-weight="700" font-family="sans-serif">贷</text>
+              </svg>
+            </div>
+            <span>我要续期</span>
+          </a>
+          <a class="grid-item" href="#">
+            <div class="grid-icon">
+              <svg viewBox="0 0 32 32" fill="none">
+                <rect x="8" y="6" width="16" height="20" rx="1.5" stroke="#333" stroke-width="1.4" />
+                <path d="M12 14l3 3 6-6" stroke="#c41e1e" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </div>
+            <span>合同确认</span>
+          </a>
+          <a class="grid-item" href="#">
+            <div class="grid-icon">
+              <svg viewBox="0 0 32 32" fill="none">
+                <path d="M6 14l10-6 10 6v12a2 2 0 01-2 2H8a2 2 0 01-2-2V14z" stroke="#333" stroke-width="1.4" />
+                <text x="16" y="21" text-anchor="middle" font-size="8" fill="#c41e1e" font-weight="700" font-family="sans-serif">税</text>
+              </svg>
+            </div>
+            <span>房贷抵税</span>
+          </a>
+          <a class="grid-item" href="#">
+            <div class="grid-icon">
+              <svg viewBox="0 0 32 32" fill="none">
+                <rect x="8" y="6" width="16" height="20" rx="1.5" stroke="#333" stroke-width="1.4" />
+                <path d="M16 5l1.5 3h3l-2.5 2 1 3L16 12l-3 1 1-3-2.5-2h3L16 5z" fill="#e83434" opacity="0.9" />
+              </svg>
+            </div>
+            <span>合同签约</span>
+          </a>
+          <a class="grid-item" href="#">
+            <div class="grid-icon">
+              <svg viewBox="0 0 32 32" fill="none">
+                <rect x="7" y="12" width="18" height="10" rx="5" stroke="#333" stroke-width="1.4" />
+                <circle cx="20" cy="17" r="3.5" fill="#c41e1e" />
+              </svg>
+            </div>
+            <span>随鑫付开/关</span>
+          </a>
+          <a class="grid-item" href="#">
+            <div class="grid-icon">
+              <svg viewBox="0 0 32 32" fill="none">
+                <circle cx="16" cy="16" r="11" stroke="#333" stroke-width="1.4" />
+                <path d="M16 11v9M16 11l-3 3M16 11l3 3" stroke="#c41e1e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </div>
+            <span>资料补传</span>
+          </a>
+          <a class="grid-item" href="#">
+            <div class="grid-icon">
+              <svg viewBox="0 0 32 32" fill="none">
+                <rect x="8" y="6" width="16" height="20" rx="1.5" stroke="#333" stroke-width="1.4" />
+                <path d="M11 12h10M11 16h10M11 20h8" stroke="#666" stroke-width="1.2" stroke-linecap="round" />
+              </svg>
+            </div>
+            <span>借款合同</span>
+          </a>
+          <a class="grid-item" href="#">
+            <div class="grid-icon">
+              <svg viewBox="0 0 32 32" fill="none">
+                <rect x="9" y="8" width="12" height="16" rx="1" stroke="#333" stroke-width="1.3" />
+                <circle cx="21" cy="14" r="5" stroke="#c41e1e" stroke-width="1.4" />
+                <path d="M24 17l3 3" stroke="#c41e1e" stroke-width="1.4" stroke-linecap="round" />
+              </svg>
+            </div>
+            <span>征信查询授权</span>
+          </a>
+        </div>
+      </section>
+    </main>
+    </div>
+
+    <div id="view-dk" class="view view-dk">
+      <div class="sub-root sub-root-dk">
+        <header class="sub-top-bar">
+          <button type="button" class="sub-back" data-open-view="home" aria-label="返回">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M15 18l-6-6 6-6" />
+            </svg>
+          </button>
+          <h1 class="sub-top-title">贷款记录</h1>
+          <span aria-hidden="true"></span>
+        </header>
+        <div class="sub-hint-strip">请选择贷款记录</div>
+        <main class="sub-main-dk">
+          <button
+            type="button"
+            class="loan-card"
+            id="btn-open-loan-detail"
+            data-loan-total="30000"
+            data-loan-balance="30000"
+            data-loan-no="0197251221000000002"
+            aria-label="你好e贷（新）"
+          >
+            <div class="loan-card-main">
+              <h2>你好e贷（新）</h2>
+              <p class="loan-id">0197251221000000002</p>
+              <div class="loan-meta">
+                <p>贷款总额：￥30,000.00</p>
+                <p>待还款金额：￥30,000.00</p>
+              </div>
+            </div>
+            <span class="loan-action">
+              进入
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 18l6-6-6-6" />
+              </svg>
+            </span>
+          </button>
+        </main>
+      </div>
+    </div>
+
+    <div id="view-ed" class="view view-ed">
+      <div class="sub-root sub-root-ed">
+        <header class="sub-top-bar">
+          <button type="button" class="sub-back" data-open-view="home" aria-label="返回">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M15 18l-6-6 6-6" />
+            </svg>
+          </button>
+          <span class="sub-top-title">额度记录</span>
+          <span aria-hidden="true"></span>
+        </header>
+        <main class="sub-main-ed">
+          <article class="ed-card" aria-label="额度信息">
+            <div class="ed-card-head">
+              <h2>你好e贷</h2>
+              <a href="#">额度详情 &gt;</a>
+            </div>
+            <p class="ed-hint">您可以借(元) <span style="white-space: nowrap">(以实际审批为准)</span></p>
+            <div class="ed-amount-row">
+              <span class="ed-amount">54,000.00</span>
+              <button type="button" class="ed-btn-use">立即用款</button>
+            </div>
+            <p class="ed-term">额度期限：2026-12-08</p>
+            <div class="ed-divider" role="presentation"></div>
+            <div class="ed-expand" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </div>
+          </article>
+        </main>
+      </div>
+    </div>
+
+    <div id="view-xq" class="view view-xq">
+      <div class="detail-page">
+        <header class="detail-top">
+          <div class="detail-top-inner">
+            <button type="button" class="detail-back" data-open-view="dk" aria-label="返回">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M15 18l-6-6 6-6" />
+              </svg>
+            </button>
+            <h1 class="detail-title">贷款详情</h1>
+            <span aria-hidden="true"></span>
+          </div>
+        </header>
+
+        <main class="detail-main">
+          <section class="xq-summary" aria-label="贷款金额摘要">
+            <div class="xq-summary-col">
+              <div class="xq-summary-label">贷款总额(元)</div>
+              <div class="xq-summary-num" id="amt-total">30,000.00</div>
+            </div>
+            <div class="xq-summary-col">
+              <div class="xq-summary-label">贷款余额(元)</div>
+              <div class="xq-summary-num" id="amt-balance">30,000.00</div>
+            </div>
+          </section>
+
+          <section class="xq-block" aria-label="状态与期限">
+            <div class="xq-row">
+              <span class="xq-row-label">贷款状态</span>
+              <span class="xq-row-value">正常</span>
+            </div>
+            <div class="xq-row">
+              <span class="xq-row-label">贷款期限</span>
+              <span class="xq-row-value">6月</span>
+            </div>
+          </section>
+
+          <section class="xq-block" aria-label="明细">
+            <div class="xq-row">
+              <span class="xq-row-label">发放日期</span>
+              <span class="xq-row-value">2026-05-03</span>
+            </div>
+            <div class="xq-row">
+              <span class="xq-row-label">到期日期</span>
+              <span class="xq-row-value">2026-11-02</span>
+            </div>
+            <div class="xq-row">
+              <span class="xq-row-label">贷款利率</span>
+              <span class="xq-row-value">3.000 %</span>
+            </div>
+            <div class="xq-row">
+              <span class="xq-row-label">借款编号</span>
+              <div class="xq-row-value xq-row-value-row">
+                <span id="iou-no">0197251221000000002</span>
+                <button type="button" class="xq-link-copy" id="btn-copy">复制</button>
+              </div>
+            </div>
+          </section>
+
+          <section class="xq-block">
+            <button type="button" class="xq-row-link" id="btn-open-plan" aria-label="还款计划" aria-haspopup="dialog" aria-controls="drawer-plan">
+              <span class="xq-row-label">还款计划</span>
+              <span class="xq-chev" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M9 18l6-6-6-6" />
+                </svg>
+              </span>
+            </button>
+          </section>
+
+          <div class="xq-main-cta">
+            <button type="button" class="xq-btn-primary" id="btn-prepay">提前还款</button>
+          </div>
+        </main>
+
+        <div class="drawer-root" id="drawer-root" aria-hidden="true">
+          <div class="drawer-mask" id="drawer-mask" tabindex="-1"></div>
+          <div class="drawer-sheet" id="drawer-plan" role="dialog" aria-modal="true" aria-labelledby="drawer-plan-title">
+            <div class="drawer-head">
+              <button type="button" class="drawer-close" id="drawer-close" aria-label="关闭">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+              </button>
+              <h2 class="drawer-head-title" id="drawer-plan-title">还款计划</h2>
+              <span aria-hidden="true"></span>
+            </div>
+            <div class="drawer-body">
+              <div class="plan-tabs" role="tablist" aria-label="还款方式">
+                <button type="button" class="plan-tab" role="tab" aria-selected="false">等额本息</button>
+                <button type="button" class="plan-tab" role="tab" aria-selected="false">等额本金</button>
+                <button type="button" class="plan-tab is-active" role="tab" aria-selected="true">按月付息<br />到期还本</button>
+              </div>
+              <p class="plan-hint">贷款到期日一次性归还贷款本金</p>
+              <p class="plan-summary">
+                还款总额 ¥30,452.50，利息总额为 <span class="interest">¥452.50</span>
+              </p>
+              <ul class="plan-timeline">
+                <li class="plan-item">
+                  <div class="plan-date">06-20</div>
+                  <div class="plan-track"><span class="plan-dot"></span><span class="plan-line"></span></div>
+                  <div class="plan-detail">
+                    <div class="plan-amt">¥ 120.00</div>
+                    <div class="plan-sub">本金：0　利息：120.00</div>
+                  </div>
+                </li>
+                <li class="plan-item">
+                  <div class="plan-date">07-20</div>
+                  <div class="plan-track"><span class="plan-dot"></span><span class="plan-line"></span></div>
+                  <div class="plan-detail">
+                    <div class="plan-amt">¥ 75.00</div>
+                    <div class="plan-sub">本金：0　利息：75.00</div>
+                  </div>
+                </li>
+                <li class="plan-item">
+                  <div class="plan-date">08-20</div>
+                  <div class="plan-track"><span class="plan-dot"></span><span class="plan-line"></span></div>
+                  <div class="plan-detail">
+                    <div class="plan-amt">¥ 75.00</div>
+                    <div class="plan-sub">本金：0　利息：75.00</div>
+                  </div>
+                </li>
+                <li class="plan-item">
+                  <div class="plan-date">09-20</div>
+                  <div class="plan-track"><span class="plan-dot"></span><span class="plan-line"></span></div>
+                  <div class="plan-detail">
+                    <div class="plan-amt">¥ 75.00</div>
+                    <div class="plan-sub">本金：0　利息：75.00</div>
+                  </div>
+                </li>
+                <li class="plan-item">
+                  <div class="plan-date">10-20</div>
+                  <div class="plan-track"><span class="plan-dot"></span><span class="plan-line"></span></div>
+                  <div class="plan-detail">
+                    <div class="plan-amt">¥ 75.00</div>
+                    <div class="plan-sub">本金：0　利息：75.00</div>
+                  </div>
+                </li>
+                <li class="plan-item">
+                  <div class="plan-date">11-02</div>
+                  <div class="plan-track"><span class="plan-dot"></span><span class="plan-line"></span></div>
+                  <div class="plan-detail">
+                    <div class="plan-amt">¥ 30032.50</div>
+                    <div class="plan-sub">本金：30000　利息：32.50</div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="drawer-foot">
+              <button type="button" class="btn-confirm" id="drawer-confirm">确定</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="view-tqhk" class="view view-tqhk">
+      <div class="detail-page">
+        <header class="detail-top">
+          <div class="detail-top-inner">
+            <button type="button" class="detail-back" data-open-view="xq" aria-label="返回">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M15 18l-6-6 6-6" />
+              </svg>
+            </button>
+            <h1 class="detail-title">提前还款</h1>
+            <span aria-hidden="true"></span>
+          </div>
+        </header>
+        <main class="detail-main">
+          <div class="tq-card">
+            <p class="tq-card-label">当前贷款余额(元)</p>
+            <p class="tq-card-balance" id="show-balance">—</p>
+          </div>
+          <p class="tq-field-label">还款金额(元)</p>
+          <div class="tq-field-wrap">
+            <span class="prefix">¥</span>
+            <input type="number" id="input-amount" inputmode="decimal" placeholder="请输入金额" step="0.01" min="0.01" autocomplete="off" />
+          </div>
+          <p class="tq-hint" id="hint-range"></p>
+          <button type="button" class="tq-btn-submit" id="btn-submit-prepay">确认还款</button>
+        </main>
+      </div>
+    </div>
+
+    <nav class="bottom-nav" aria-label="主导航">
+      <button type="button" class="nav-item">
+        <span class="nav-ico">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+            <path d="M6 8h12v12H6zM9 8V6a3 3 0 016 0v2" />
+          </svg>
+        </span>
+        我要消费
+      </button>
+      <button type="button" class="nav-item">
+        <span class="nav-ico">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+            <path d="M4 10l8-5 8 5v9a1 1 0 01-1 1h-4v-5H9v5H5a1 1 0 01-1-1v-9z" />
+          </svg>
+        </span>
+        我要经营
+      </button>
+      <button type="button" class="nav-item">
+        <span class="nav-ico">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+            <rect x="4" y="4" width="7" height="16" rx="1" />
+            <rect x="13" y="8" width="7" height="12" rx="1" />
+          </svg>
+        </span>
+        我要买房
+      </button>
+      <button type="button" class="nav-item active" aria-current="page">
+        <span class="nav-ico nav-ico-wrap">
+          <svg viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="9" r="3.5" stroke="#fff" stroke-width="1.6" />
+            <path d="M6 19v-1a6 6 0 0112 0v1" stroke="#fff" stroke-width="1.6" stroke-linecap="round" />
+          </svg>
+        </span>
+        我的贷款
+      </button>
+    </nav>
+  </div>
+
+  <script>
+    (function () {
+      var views = {
+        home: document.getElementById("view-home"),
+        dk: document.getElementById("view-dk"),
+        ed: document.getElementById("view-ed"),
+        xq: document.getElementById("view-xq"),
+        tqhk: document.getElementById("view-tqhk"),
+      };
+      var app = document.getElementById("app-root");
+      var nav = document.querySelector(".bottom-nav");
+      if (!views.home || !app || !nav) return;
+
+      var loanState = { total: 30000, balance: 30000, no: "0197251221000000002" };
+
+      function formatMoneyNum(n) {
+        if (typeof n !== "number" || isNaN(n)) return "—";
+        return n.toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      }
+
+      function applyLoanDetailDOM() {
+        var elT = document.getElementById("amt-total");
+        var elB = document.getElementById("amt-balance");
+        var elN = document.getElementById("iou-no");
+        if (elT) elT.textContent = formatMoneyNum(loanState.total);
+        if (elB) elB.textContent = formatMoneyNum(loanState.balance);
+        if (elN) elN.textContent = loanState.no;
+      }
+
+      function applyTqhkPanel() {
+        var showBal = document.getElementById("show-balance");
+        var inp = document.getElementById("input-amount");
+        var hint = document.getElementById("hint-range");
+        var bal = loanState.balance;
+        if (showBal) showBal.textContent = formatMoneyNum(bal);
+        if (inp) {
+          inp.value = "";
+          inp.setAttribute("max", String(bal));
+        }
+        if (hint) {
+          hint.textContent =
+            "可输入 0.01～" + formatMoneyNum(bal) + "，提交后返回详情页并更新贷款余额。";
+        }
+      }
+
+      function closeDrawer() {
+        var root = document.getElementById("drawer-root");
+        if (!root || !root.classList.contains("is-open")) return;
+        root.classList.remove("is-open");
+        root.setAttribute("aria-hidden", "true");
+        document.body.classList.remove("drawer-open");
+      }
+
+      function show(name) {
+        var key = views[name] ? name : "home";
+        Object.keys(views).forEach(function (k) {
+          if (views[k]) views[k].classList.toggle("is-active", k === key);
+        });
+        var sub = key !== "home";
+        nav.classList.toggle("is-hidden", sub);
+        app.classList.toggle("hide-bottom-nav", sub);
+        if (key !== "xq") closeDrawer();
+        if (key === "home") {
+          history.replaceState(null, "", location.pathname + location.search);
+        } else {
+          history.replaceState(null, "", "#" + key);
+        }
+      }
+
+      document.querySelectorAll("[data-open-view]").forEach(function (el) {
+        el.addEventListener("click", function () {
+          show(el.getAttribute("data-open-view") || "home");
+        });
+      });
+
+      var btnLoan = document.getElementById("btn-open-loan-detail");
+      if (btnLoan) {
+        btnLoan.addEventListener("click", function () {
+          loanState.total = parseFloat(btnLoan.getAttribute("data-loan-total"), 10) || 30000;
+          loanState.balance = parseFloat(btnLoan.getAttribute("data-loan-balance"), 10) || loanState.total;
+          loanState.no = btnLoan.getAttribute("data-loan-no") || "";
+          applyLoanDetailDOM();
+          show("xq");
+        });
+      }
+
+      var btnPrepay = document.getElementById("btn-prepay");
+      if (btnPrepay) {
+        btnPrepay.addEventListener("click", function () {
+          applyTqhkPanel();
+          show("tqhk");
+        });
+      }
+
+      var btnSubmitPrepay = document.getElementById("btn-submit-prepay");
+      if (btnSubmitPrepay) {
+        btnSubmitPrepay.addEventListener("click", function () {
+          var raw = document.getElementById("input-amount");
+          var amt = parseFloat(String(raw && raw.value).replace(/,/g, ""), 10);
+          var balance = loanState.balance;
+          if (isNaN(amt) || amt <= 0) {
+            alert("请输入大于 0 的还款金额");
+            return;
+          }
+          if (amt > balance + 1e-6) {
+            alert("还款金额不能超过当前贷款余额");
+            return;
+          }
+          var newBal = Math.round((balance - amt) * 100) / 100;
+          if (newBal < 0) newBal = 0;
+          loanState.balance = newBal;
+          applyLoanDetailDOM();
+          show("xq");
+        });
+      }
+
+      var btnCopy = document.getElementById("btn-copy");
+      var elNo = document.getElementById("iou-no");
+      if (btnCopy && elNo) {
+        btnCopy.addEventListener("click", function () {
+          var text = elNo.textContent || "";
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(function () {}).catch(function () {});
+          }
+        });
+      }
+
+      var drawerRoot = document.getElementById("drawer-root");
+      var drawerMask = document.getElementById("drawer-mask");
+      var btnOpenPlan = document.getElementById("btn-open-plan");
+      var drawerClose = document.getElementById("drawer-close");
+      var drawerConfirm = document.getElementById("drawer-confirm");
+
+      function openDrawer() {
+        if (!drawerRoot) return;
+        drawerRoot.classList.add("is-open");
+        drawerRoot.setAttribute("aria-hidden", "false");
+        document.body.classList.add("drawer-open");
+        drawerClose && drawerClose.focus();
+      }
+
+      if (btnOpenPlan && drawerRoot) {
+        btnOpenPlan.addEventListener("click", openDrawer);
+      }
+      if (drawerMask) drawerMask.addEventListener("click", closeDrawer);
+      if (drawerClose) drawerClose.addEventListener("click", closeDrawer);
+      if (drawerConfirm) drawerConfirm.addEventListener("click", closeDrawer);
+
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && drawerRoot && drawerRoot.classList.contains("is-open")) {
+          closeDrawer();
+        }
+      });
+
+      if (drawerRoot) {
+        drawerRoot.querySelectorAll(".plan-tab").forEach(function (tab) {
+          tab.addEventListener("click", function () {
+            drawerRoot.querySelectorAll(".plan-tab").forEach(function (t) {
+              t.classList.remove("is-active");
+              t.setAttribute("aria-selected", "false");
+            });
+            tab.classList.add("is-active");
+            tab.setAttribute("aria-selected", "true");
+          });
+        });
+      }
+
+      function syncHash() {
+        var h = (location.hash || "").replace(/^#/, "");
+        if (h === "dk" || h === "ed" || h === "xq" || h === "tqhk") {
+          if (h === "xq") applyLoanDetailDOM();
+          if (h === "tqhk") applyTqhkPanel();
+          show(h);
+        } else {
+          show("home");
+        }
+      }
+
+      window.addEventListener("hashchange", syncHash);
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", syncHash);
+      } else {
+        syncHash();
+      }
+    })();
+  </script>
+</body>
+</html>
